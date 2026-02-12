@@ -4,6 +4,7 @@ import com.alura.litquest_api.client.GutendexClient;
 import com.alura.litquest_api.model.Autor;
 import com.alura.litquest_api.model.Data;
 import com.alura.litquest_api.model.DatosLibro;
+import com.alura.litquest_api.repository.LibroRepository;
 import com.alura.litquest_api.service.ConversorDatos;
 
 import java.util.Collections;
@@ -11,14 +12,22 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
+
+
 public class Principal {
 
     private GutendexClient gutendexClient;
     private Data data;
     private ConversorDatos conversorDatos;
     private DatosLibro datosLibro;
+    private LibroRepository repositorio;
 
     private Scanner teclado = new Scanner(System.in);
+
+    public Principal(LibroRepository repository){
+        this.repositorio = repository;
+
+    }
     //Conexion API
     public List<DatosLibro> obtenerDataAPI(){
 

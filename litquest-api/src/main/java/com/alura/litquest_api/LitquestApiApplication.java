@@ -2,13 +2,19 @@ package com.alura.litquest_api;
 
 import com.alura.litquest_api.principal.Principal;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.alura.litquest_api.repository.LibroRepository;
 
 @SpringBootApplication
 //indicamos que funcionara por la consola
 public class LitquestApiApplication implements CommandLineRunner {
+
+    @Autowired
+    private LibroRepository repository;
+
 
 	public static void main(String[] args) {
         Dotenv dotenv = Dotenv.configure()
@@ -29,7 +35,7 @@ public class LitquestApiApplication implements CommandLineRunner {
     // metodo que busca spring para arrancar la logica
     @Override
         public void run(String... args)throws Exception{
-        Principal principal = new Principal();
+        Principal principal = new Principal(repository);
         principal.ejecutarAplicacion();
     }
 
