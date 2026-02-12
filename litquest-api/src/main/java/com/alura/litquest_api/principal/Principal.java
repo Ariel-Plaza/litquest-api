@@ -54,9 +54,8 @@ public class Principal {
                     case 1:
                         System.out.println("Ingrese el nombre del libro que desea buscar:");
                         var libro = teclado.nextLine();
-                        List libros =  obtenerDataAPI(libro);
-                        String libroBuscado =  obtenerLibroPorNombre(libros, libro);
-                        System.out.println(libroBuscado);
+                        buscarLibroAPI(libro);
+
                         break;
                     case 2:
                         System.out.println("opcion2");
@@ -87,22 +86,24 @@ public class Principal {
     }
 
 
+    private void buscarLibroAPI(String librobuscado){
+        List libros =  obtenerDataAPI(librobuscado);
+        System.out.println(libros);
+        if(libros !=null && !libros.isEmpty()){
+            String resultado =  obtenerLibroPorNombre(libros, librobuscado);
+            System.out.println(resultado);
+
+        }else{
+            System.out.println("No se encontro el libro: " + librobuscado);
+        }
+    }
+
     //Conexion API
     public List<DatosLibro> obtenerDataAPI(String libro){
-
         try {
             String json = gutendexClient.get(libro);
             Data datos = conversorDatos.convierteDatos(json, Data.class);
-            List<DatosLibro> libros = extraerLibros(datos);
-//            System.out.println(libros);
-            return  libros;
-
-
-            //            System.out.println(dataconvertida);
-            //            List<DatosLibro> libros = extraerLibros(dataconvertida);
-            //            System.out.println(libros);
-            //            List<Autor> autor = obtenerAutoresPorTitulo(libros, "Frankenstein; Or, The Modern Prometheus");
-            //            System.out.println(autor);
+            return datos.resultados();
 
         } catch (Exception e) {
             System.out.println("Error al recuperar la informacion de la API" + e.getMessage());
@@ -110,39 +111,24 @@ public class Principal {
         }
     }
 
-    public List<DatosLibro> extraerLibros(Data data) {
-        return data.resultados();
-    }
-
 //    buscar por el nombre del libro, -> Titulo, Autor, Idioma, Numero descargas.
     public String obtenerLibroPorNombre(List<DatosLibro> libro, String libroBuscado) {
         return libro.stream()
                 .filter(l -> l.titulo().toUpperCase().contains(libroBuscado.toUpperCase()))
                 .findFirst()
-                .map(l -> String.format("----- LIBRO ------\n" +
-                                "Titulo: %s\n" +
-                                "Autor: %s\n" +
-                                "Idioma: %s\n" +
-                                "Descargas: %s",
-                        l.titulo(), l.autores().get(0).nombre(), l.idiomas().get(0), l.numerodescargas()))
+                .map(l -> {
+                    //validacion que existe autor
+                    String nombreAutor = l.autores().isEmpty() ? "Autor desconocido" : l.autores().get(0).nombre();
+                    String idioma = l.idiomas().isEmpty() ? "Desconocido" : l.idiomas().get(0);
+
+                    return String.format("----- LIBRO ------\n" +
+                                    "Titulo: %s\n" +
+                                    "Autor: %s\n" +
+                                    "Idioma: %s\n" +
+                                    "Descargas: %s",
+                            l.titulo(), nombreAutor, idioma, l.numerodescargas());
+                })
                 .orElse("Libro no encontrado");
     };
 };
 
-
-
-
-
-//
-//    public List<Autor> obtenerAutoresPorTitulo(List<DatosLibro> listaDeLibros, String tituloBuscado) {
-//        return listaDeLibros.stream()
-//                // filtra por el titulo, convierte el titulo en mayuscula, y busca en datoslibro el titulo que contenga el buscado
-//                .filter(l -> l.titulo().toUpperCase().contains(tituloBuscado.toUpperCase()))
-//                // obtener el primero que coincida
-//                .findFirst()
-//                // Si lo encuentra navega hacia la lista de autores
-//                .map(l -> l.autores())
-//                //Si no hubo coincidencias, devolvemos una lista vacía (evita errores)
-//                .orElse(Collections.emptyList());
-//    }
-//}
