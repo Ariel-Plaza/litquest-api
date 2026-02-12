@@ -26,31 +26,7 @@ public class Principal {
 
     public Principal(LibroRepository repository){
         this.repositorio = repository;
-
     }
-    //Conexion API
-    public List<DatosLibro> obtenerDataAPI(){
-
-        try {
-            String json = gutendexClient.get();
-            Data datos = conversorDatos.convierteDatos(json, Data.class);
-            List<DatosLibro> libros = extraerLibros(datos);
-//            System.out.println(libros);
-            return  libros;
-
-
-    //            System.out.println(dataconvertida);
-    //            List<DatosLibro> libros = extraerLibros(dataconvertida);
-    //            System.out.println(libros);
-    //            List<Autor> autor = obtenerAutoresPorTitulo(libros, "Frankenstein; Or, The Modern Prometheus");
-    //            System.out.println(autor);
-
-        } catch (Exception e) {
-            System.out.println("Error al recuperar la informacion de la API" + e.getMessage());
-            return null;
-        }
-    }
-
 
     public void ejecutarAplicacion() {
         gutendexClient = new GutendexClient();
@@ -76,9 +52,9 @@ public class Principal {
                 teclado.nextLine();
                 switch (opcion) {
                     case 1:
-                        List libros =  obtenerDataAPI();
                         System.out.println("Ingrese el nombre del libro que desea buscar:");
                         var libro = teclado.nextLine();
+                        List libros =  obtenerDataAPI(libro);
                         String libroBuscado =  obtenerLibroPorNombre(libros, libro);
                         System.out.println(libroBuscado);
                         break;
@@ -107,19 +83,31 @@ public class Principal {
                 teclado.nextLine();
                 opcion = -1;
             }
-
         }
-
-
-
     }
 
 
+    //Conexion API
+    public List<DatosLibro> obtenerDataAPI(String libro){
+
+        try {
+            String json = gutendexClient.get(libro);
+            Data datos = conversorDatos.convierteDatos(json, Data.class);
+            List<DatosLibro> libros = extraerLibros(datos);
+//            System.out.println(libros);
+            return  libros;
 
 
-    public Data convertirDatos(String json ){
+            //            System.out.println(dataconvertida);
+            //            List<DatosLibro> libros = extraerLibros(dataconvertida);
+            //            System.out.println(libros);
+            //            List<Autor> autor = obtenerAutoresPorTitulo(libros, "Frankenstein; Or, The Modern Prometheus");
+            //            System.out.println(autor);
 
-        return conversorDatos.convierteDatos(json, Data.class);
+        } catch (Exception e) {
+            System.out.println("Error al recuperar la informacion de la API" + e.getMessage());
+            return null;
+        }
     }
 
     public List<DatosLibro> extraerLibros(Data data) {

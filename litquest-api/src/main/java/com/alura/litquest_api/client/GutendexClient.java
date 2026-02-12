@@ -20,11 +20,11 @@ public class GutendexClient {
                 .build();
     }
 
-    public String get() throws IOException, InterruptedException {
+    public String get(String title) throws IOException, InterruptedException {
 
         // Crea la petición HTTP GET
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(APIURL)) // URL a la que hacer petición
+                .uri(URI.create(APIURL + "?search=" + title.replace(" ", "+"))) // URL a la que hacer petición
                 .GET()
                 .build();
 
