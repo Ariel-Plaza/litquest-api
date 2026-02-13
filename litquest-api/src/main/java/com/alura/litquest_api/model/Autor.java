@@ -3,6 +3,7 @@ package com.alura.litquest_api.model;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "autor")
@@ -15,7 +16,7 @@ public class Autor {
     private Integer nacimiento;
     private Integer fallecimiento;
 
-    @ManyToMany(mappedBy = "autores")
+    @ManyToMany(mappedBy = "autores", fetch = FetchType.EAGER)
     private List<Libro> libros = new ArrayList<>();
 
     public Autor() {}
@@ -67,12 +68,13 @@ public class Autor {
     }
 
     @Override
-    public String toString() {
-        return "Autor{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", nacimiento=" + nacimiento +
-                ", fallecimiento=" + fallecimiento +
-                '}';
+    public String toString() {String librosAutor = libros.stream()
+            .map(l -> l.getTitulo())  // Solo extrae el título
+            .collect(Collectors.joining(", "));
+
+        return  "Autor: " + nombre +
+                "\nFecha de nacimiento=" + nacimiento +
+                "\nFecha de fallecimiento=" + fallecimiento+
+                "\nLibros: " + librosAutor + "\n";
     }
 }

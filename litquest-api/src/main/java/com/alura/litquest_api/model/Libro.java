@@ -53,18 +53,16 @@ public class Libro {
 
     @Override
     public String toString() {
-        //procesa con stream para solo obtener el nombre de los autores
-        String nombresAutores = autores.stream()
-                .map(Autor::getNombre)
-                .collect(Collectors.joining(", "));
 
-        return "Libro{" +
-                "id=" + id +
-                ", titulo='" + titulo + '\'' +
-                ", idiomas='" + idiomas + '\'' +
-                ", numerodescargas=" + numerodescargas +
-                ", autores=" + nombresAutores +
-                '}';
+        String nombreAutor = autores.stream()
+                .map(a -> a.getNombre())
+                .collect(Collectors.joining(","));
+        return String.format("----- LIBRO ------\n" +
+                        "Titulo: %s\n" +
+                        "Autor: %s\n" +
+                        "Idioma: %s\n" +
+                        "Descargas: %s\n",
+                titulo, nombreAutor, idiomas, numerodescargas);
     }
 
     public Long getId() {

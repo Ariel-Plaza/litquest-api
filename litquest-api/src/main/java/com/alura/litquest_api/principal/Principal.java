@@ -7,32 +7,30 @@ import com.alura.litquest_api.model.DatosLibro;
 import com.alura.litquest_api.model.Libro;
 import com.alura.litquest_api.repository.LibroRepository;
 import com.alura.litquest_api.service.ConversorDatos;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-
+import java.util.stream.Collectors;
 
 
 public class Principal {
 
     private GutendexClient gutendexClient;
-    private Data data;
     private ConversorDatos conversorDatos;
-    private DatosLibro datosLibro;
     private LibroRepository repositorio;
 
     private Scanner teclado = new Scanner(System.in);
 
     public Principal(LibroRepository repository){
         this.repositorio = repository;
+        gutendexClient = new GutendexClient();
+        conversorDatos = new ConversorDatos();
     }
 
     public void ejecutarAplicacion() {
-        gutendexClient = new GutendexClient();
-        conversorDatos = new ConversorDatos();
-
 
         String mensaje = """
                 ----------
@@ -57,12 +55,15 @@ public class Principal {
                         var libro = teclado.nextLine();
                         buscarLibroAPI(libro);
 
+
                         break;
                     case 2:
                         System.out.println("opcion2");
+                        listarLibrosRegistrados();
                         break;
                     case 3:
                         System.out.println("opcion3");
+                        listarAutoresRegistrados();
                         break;
                     case 4:
                         System.out.println("opcion4");
@@ -71,8 +72,9 @@ public class Principal {
                         System.out.println("opcion5");
                         break;
                     case 6:
+                        teclado.close();
                         System.exit(0);
-                        break;
+                        return;
                     default:
                         System.out.println("La opcion ingresada no es válida...");
                         break;
@@ -88,10 +90,9 @@ public class Principal {
 
 //CASE 1
     private void buscarLibroAPI(String librobuscado){
-        List libros =  obtenerDataAPI(librobuscado);
+        List<DatosLibro> libros =  obtenerDataAPI(librobuscado);
         if(libros !=null && !libros.isEmpty()){
             String resultado =  obtenerLibroPorNombre(libros, librobuscado);
-
             System.out.println(resultado);
         }else{
             System.out.println("No se encontro el libro: " + librobuscado);
@@ -99,7 +100,7 @@ public class Principal {
     }
 
     //Conexion API
-    public List<DatosLibro> obtenerDataAPI(String libro){
+    private List<DatosLibro> obtenerDataAPI(String libro){
         try {
             String json = gutendexClient.get(libro);
             Data datos = conversorDatos.convierteDatos(json, Data.class);
@@ -111,7 +112,7 @@ public class Principal {
         }
     }
 
-    public String obtenerLibroPorNombre(List<DatosLibro> libros, String libroBuscado) {
+    private String obtenerLibroPorNombre(List<DatosLibro> libros, String libroBuscado) {
         return libros.stream()
                 .filter(l -> l.titulo().toUpperCase().contains(libroBuscado.toUpperCase()))
                 .findFirst()
@@ -123,8 +124,46 @@ public class Principal {
                 })
                 .orElse("Libro no encontrado");
     }
+
+    //CASE 2 Listar Libros
+    private void listarLibrosRegistrados(){
+        List<Libro> libros = repositorio.findAll();
+        if(libros.isEmpty()){
+            System.out.println("No existen libros registrados");
+        }else{
+            System.out.println();
+            libros.forEach(System.out::println);
+        }
+    }
+
+    ///CASE 3  Listar autores registrados
+
+    private void listarAutoresRegistrados(){
+        List<Libro> libros = repositorio.findAll();
+        List<Autor> autores = libros.stream()
+                .flatMap(l -> l.getAutores().stream())
+                .distinct()
+                .collect(Collectors.toList());
+
+        // IMPORTANTE: Forzar la carga de libros ANTES de imprimir
+        autores.forEach(a -> a.getLibros().size());
+
+        // Ahora sí imprime con los libros cargados
+        autores.forEach(System.out::println);
+    }
+
+    //CASE 4 Listar autores vivos en un determinado año
+
+    //CASE 5  Listar libros por idioma
+
+
+
+
+
+
+
 };
 
-//CASE 2
+
 
 
