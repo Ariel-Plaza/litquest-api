@@ -4,6 +4,7 @@ import com.alura.litquest_api.client.GutendexClient;
 import com.alura.litquest_api.model.Autor;
 import com.alura.litquest_api.model.Data;
 import com.alura.litquest_api.model.DatosLibro;
+import com.alura.litquest_api.model.Libro;
 import com.alura.litquest_api.repository.LibroRepository;
 import com.alura.litquest_api.service.ConversorDatos;
 
@@ -85,14 +86,13 @@ public class Principal {
         }
     }
 
-
+//CASE 1
     private void buscarLibroAPI(String librobuscado){
         List libros =  obtenerDataAPI(librobuscado);
-        System.out.println(libros);
         if(libros !=null && !libros.isEmpty()){
             String resultado =  obtenerLibroPorNombre(libros, librobuscado);
-            System.out.println(resultado);
 
+            System.out.println(resultado);
         }else{
             System.out.println("No se encontro el libro: " + librobuscado);
         }
@@ -111,24 +111,20 @@ public class Principal {
         }
     }
 
-//    buscar por el nombre del libro, -> Titulo, Autor, Idioma, Numero descargas.
-    public String obtenerLibroPorNombre(List<DatosLibro> libro, String libroBuscado) {
-        return libro.stream()
+    public String obtenerLibroPorNombre(List<DatosLibro> libros, String libroBuscado) {
+        return libros.stream()
                 .filter(l -> l.titulo().toUpperCase().contains(libroBuscado.toUpperCase()))
                 .findFirst()
                 .map(l -> {
-                    //validacion que existe autor
-                    String nombreAutor = l.autores().isEmpty() ? "Autor desconocido" : l.autores().get(0).nombre();
-                    String idioma = l.idiomas().isEmpty() ? "Desconocido" : l.idiomas().get(0);
+                    Libro libroParaBD = new Libro(l);
+                    repositorio.save(libroParaBD);
 
-                    return String.format("----- LIBRO ------\n" +
-                                    "Titulo: %s\n" +
-                                    "Autor: %s\n" +
-                                    "Idioma: %s\n" +
-                                    "Descargas: %s",
-                            l.titulo(), nombreAutor, idioma, l.numerodescargas());
+                    return l.toString();
                 })
                 .orElse("Libro no encontrado");
-    };
+    }
 };
+
+//CASE 2
+
 

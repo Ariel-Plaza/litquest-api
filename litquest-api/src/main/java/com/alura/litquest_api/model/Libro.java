@@ -87,7 +87,7 @@ public class Libro {
         return idiomas;
     }
 
-    public void setIdiomas(String idioma) {
+    public void setIdiomas(String idiomas) {
         this.idiomas = idiomas;
     }
 
