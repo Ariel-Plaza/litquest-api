@@ -7,6 +7,7 @@ import com.alura.litquest_api.model.DatosLibro;
 import com.alura.litquest_api.model.Libro;
 import com.alura.litquest_api.repository.LibroRepository;
 import com.alura.litquest_api.service.ConversorDatos;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-
+@Component
 public class Principal {
 
     private GutendexClient gutendexClient;
@@ -54,22 +55,20 @@ public class Principal {
                         System.out.println("Ingrese el nombre del libro que desea buscar:");
                         var libro = teclado.nextLine();
                         buscarLibroAPI(libro);
-
-
                         break;
                     case 2:
-                        System.out.println("opcion2");
                         listarLibrosRegistrados();
                         break;
                     case 3:
-                        System.out.println("opcion3");
                         listarAutoresRegistrados();
                         break;
                     case 4:
-                        System.out.println("opcion4");
+                        System.out.println("Ingrese el año vivo de autor(es) que desea buscar:");
+                        Integer annioBusqueda = teclado.nextInt();
+                        buscarAutoresVivosPorFecha(annioBusqueda);
                         break;
                     case 5:
-                        System.out.println("opcion5");
+                        listarLibrosPorIdioma();
                         break;
                     case 6:
                         teclado.close();
@@ -119,7 +118,6 @@ public class Principal {
                 .map(l -> {
                     Libro libroParaBD = new Libro(l);
                     repositorio.save(libroParaBD);
-
                     return l.toString();
                 })
                 .orElse("Libro no encontrado");
@@ -137,24 +135,83 @@ public class Principal {
     }
 
     ///CASE 3  Listar autores registrados
-
+    @Transactional
     private void listarAutoresRegistrados(){
         List<Libro> libros = repositorio.findAll();
         List<Autor> autores = libros.stream()
                 .flatMap(l -> l.getAutores().stream())
                 .distinct()
                 .collect(Collectors.toList());
-
-        // IMPORTANTE: Forzar la carga de libros ANTES de imprimir
+        if (autores.isEmpty()) {
+            System.out.println("No existen autores registrados");
+            return;
+        }
         autores.forEach(a -> a.getLibros().size());
-
-        // Ahora sí imprime con los libros cargados
         autores.forEach(System.out::println);
     }
 
     //CASE 4 Listar autores vivos en un determinado año
+    @Transactional
+    private void buscarAutoresVivosPorFecha(Integer annioBusqueda){
+
+        try{
+            List<Autor> autoresVivos = repositorio.findAutoresVivosEnAnio(annioBusqueda);
+            if (autoresVivos.isEmpty()) {
+                System.out.println("No se encontraron autores vivos en el año " + annioBusqueda);
+                return;
+            }
+            autoresVivos.forEach(a -> a.getLibros().size());
+            autoresVivos.forEach(System.out::println);
+        }catch(Exception e){
+            System.out.println("Error al encontrar autores"+ e.getMessage());
+        }
+    }
 
     //CASE 5  Listar libros por idioma
+    private void listarLibrosPorIdioma() {
+        String menuIdiomas = """
+            Ingrese el idioma para buscar los libros:
+            es - Español
+            en - Inglés
+            fr - Francés
+            pt - Portugués
+            """;
+
+        System.out.println(menuIdiomas);
+        String idiomaSeleccionado = teclado.nextLine().toLowerCase().trim();
+
+        if (!esIdiomaValido(idiomaSeleccionado)) {
+            System.out.println("Idioma no válido. Use: es, en, fr, pt");
+            return;
+        }
+
+        List<Libro> libros = repositorio.findAll();
+        List<Libro> librosPorIdioma = libros.stream()
+                .filter(l -> l.getIdiomas().contains(idiomaSeleccionado))
+                .collect(Collectors.toList());
+
+        if (librosPorIdioma.isEmpty()) {
+            System.out.println("No se encontraron libros en el idioma: " + nombreIdioma(idiomaSeleccionado));
+        } else {
+            System.out.println("\n--- LIBROS EN " + nombreIdioma(idiomaSeleccionado).toUpperCase() + " ---");
+            librosPorIdioma.forEach(System.out::println);
+        }
+    }
+
+    private boolean esIdiomaValido(String idioma) {
+        return idioma.equals("es") || idioma.equals("en") ||
+                idioma.equals("fr") || idioma.equals("pt");
+    }
+
+    private String nombreIdioma(String codigo) {
+        return switch (codigo) {
+            case "es" -> "Español";
+            case "en" -> "Inglés";
+            case "fr" -> "Francés";
+            case "pt" -> "Portugués";
+            default -> codigo;
+        };
+    }
 
 
 
