@@ -101,4 +101,4 @@ mvn spring-boot:run
 
 ---
 
-💡 **Tip:** Empieza buscando "Pride and Prejudice" para tener datos de prueba
+Ariel Plaza - Desarrollador BackEnd
