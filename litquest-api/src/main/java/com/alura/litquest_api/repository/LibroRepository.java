@@ -12,4 +12,6 @@ public interface LibroRepository extends JpaRepository<Libro,Long> {
 
     @Query("SELECT DISTINCT a FROM Autor a WHERE a.nacimiento <= :anio AND (a.fallecimiento IS NULL OR a.fallecimiento >= :anio)")
     List<Autor> findAutoresVivosEnAnio(@Param("anio") Integer anio);
+
+    Libro findByTitulo(String titulo);
 }
