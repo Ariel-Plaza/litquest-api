@@ -83,6 +83,9 @@ public class Principal {
                 System.out.println("Debes ingresar una de las opciones");
                 teclado.nextLine();
                 opcion = -1;
+            } catch (Exception e) {
+                System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+                opcion = -1;
             }
         }
     }
@@ -116,10 +119,12 @@ public class Principal {
                 .filter(l -> l.titulo().toUpperCase().contains(libroBuscado.toUpperCase()))
                 .findFirst()
                 .map(l -> {
+                    if (repositorio.findByTitulo(l.titulo()) == null) {
                     Libro libroParaBD = new Libro(l);
                     repositorio.save(libroParaBD);
-                    return l.toString();
-                })
+                }
+                return l.toString();
+        })
                 .orElse("Libro no encontrado");
     }
 
