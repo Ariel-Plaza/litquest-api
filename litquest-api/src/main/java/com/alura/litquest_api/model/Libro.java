@@ -102,6 +102,6 @@ public class Libro {
     }
 
     public void setAutores(List<Autor> autor) {
-        this.autores = autores;
+        this.autores = autor;
     }
 }
