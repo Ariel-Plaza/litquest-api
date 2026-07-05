@@ -93,7 +93,7 @@ mvn spring-boot:run
 
 **No conecta a la base de datos:**
 - Verifica que PostgreSQL esté corriendo
-- Revisa usuario y contraseña en `application.properties`
+- Revisa usuario y contraseña en `.env`
 
 **No encuentra un libro:**
 - Solo hay libros clásicos (dominio público)
