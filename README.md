@@ -18,12 +18,12 @@ CREATE DATABASE litquest_db;
 
 ### 3. Configurar Conexión
 
-Edita `src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/litquest_db
-spring.datasource.username=TU_USUARIO
-spring.datasource.password=TU_CONTRASEÑA
-spring.jpa.hibernate.ddl-auto=update
+Crea un archivo `.env` en la raíz del proyecto (usa `.env.example` como base):
+```
+DB_HOST=localhost:5432
+DB_NAME=litquest_db
+DB_USER=tu_usuario
+DB_PASSWORD=tu_contraseña
 ```
 
 ### 4. Ejecutar
