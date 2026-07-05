@@ -22,9 +22,6 @@ public class LitquestApiApplication implements CommandLineRunner {
                 .ignoreIfMissing()
                 .load();
 
-        // Imprime para verificar que se cargó (quita después)
-        System.out.println("DB_HOST cargado: " + dotenv.get("DB_HOST"));
-
         // Cargar como propiedades del sistema
         dotenv.entries().forEach(entry ->
                 System.setProperty(entry.getKey(), entry.getValue())
